@@ -1,0 +1,79 @@
+version: "3"
+
+services:
+  nginx-proxy:
+    build: 
+      context : ./bin/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx-proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./logs/nginx-proxy:/var/log/nginx
+      - ./htdocs:/var/www
+    networks:
+      - backend
+      - frontend
+    restart: always
+  apacheserver:
+    build: 
+      context: ./bin/apache2
+    container_name: '7.3.x-webserver'
+    restart: 'always'
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    volumes: 
+      - ./htdocs:/var/www/html
+      - ./config/php/php.ini:/usr/local/etc/php/php.ini
+      - ./config/apache2/vhosts:/etc/apache2/sites-enabled
+      - ./config/apache2/httpd/port.conf:/etc/apache2/ports.conf
+      - ./logs/apache2:/var/log/apache2
+  mysql:
+    build:
+      context: "./bin/mysql"
+    container_name: '5.7.x-mysql'
+    restart: 'always'
+    ports:
+      - "3306:3306"
+    volumes: 
+      - ./config/mysql:/etc/mysql/conf.d
+      - ./data/mysql:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - backend
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: '5.0.2-phpmyadmin'
+    networks:
+      - backend
+      - default
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+      PMA_ABSOLUTE_URI: http://localhost:81
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - '81:80'
+    volumes: 
+      - ./config/php/php.ini:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
+    command: ${DISABLE_PMA}
+    entrypoint: ${DISABLE_PMA}
+networks:
+  backend: 
+    internal: true
+    driver: bridge
+  frontend:
+    internal: false
+    driver: bridge
