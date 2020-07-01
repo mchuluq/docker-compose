@@ -18,11 +18,15 @@ Is a basic LEAMPPER stack development/production environment using docker-compos
 - [x] Apache 2.4.25 PHP 7.3.x
 - [x] Nginx 1.17.10 as reverse proxy
 - [x] only Nginx proxy in frontend access, isolated apache 
-- [ ] Nginx SSL with certbot/letsencrypt, ps : sayangnya gak bisa di localhost
+- [ ] Nginx SSL with certbot/letsencrypt, unfortunately not possible on localhost
+- [ ] Optional manual SSL cert for localhost
+- [ ] use HTTP/2 protocol
 - [x] MySQL 5.7.30
 - [x] PhpMyAdmin 5.0.2-fpm-alpine
 - [x] Redis 6.0.5 Alpine
 - [ ] Elastic Search (possibly)
+- [ ] upgrade to MySQL 8.x
+- [ ] Multiple container service, independent container for different app
 
 ### Compose by
 
